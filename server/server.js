@@ -9,7 +9,17 @@ const server = http.createServer(app);
 const io = socketIO(server);
 
 io.on('connection',(socket)=>{
-    console.log('New user connected');
+    
+    socket.emit('newMessage',{
+        from : "Admin",
+        text: "Welcome to the chat App"
+    })
+    socket.broadcast.emit('newMessage',{
+        from : "Admin",
+        text: "New User joined"
+
+   
+    })
     socket.on('disconnect',()=>{
         console.log("User disconnected")
     })
@@ -17,10 +27,7 @@ io.on('connection',(socket)=>{
     socket.on('createMessage', function(message){
         console.log(message)
     })
-    socket.emit('newMessage',{
-        from : "n@gmail.com",
-        text: "hello"
-    })
+   
     
 })
 
