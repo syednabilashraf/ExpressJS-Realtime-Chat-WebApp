@@ -13,12 +13,21 @@ io.on('connection',(socket)=>{
     socket.on('disconnect',()=>{
         console.log("User disconnected")
     })
+
+    socket.on('createMessage', function(message){
+        console.log(message)
+    })
+    socket.emit('newMessage',{
+        from : "n@gmail.com",
+        text: "hello"
+    })
     
 })
 
-
+app.use(express.static('./public'))
 // app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+
 
 const port = process.env.PORT || 3000
 const publicPath = path.join(__dirname+'/../public');
