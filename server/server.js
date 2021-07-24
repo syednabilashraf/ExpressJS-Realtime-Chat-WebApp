@@ -25,6 +25,7 @@ io.on('connection',(socket)=>{
 
     socket.on('createMessage', function(message,callback){
         io.emit('newMessage',generateMessage(message.from,message.text))
+        callback()
     })
 
     socket.on('showGeolocation', function(geolocation){
