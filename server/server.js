@@ -2,30 +2,33 @@ const express = require('express');
 const path = require('path');
 const hbs = require('hbs')
 const http = require('http')
-const socketIO = require('socket.io')
+const socketIO = require('socket.io');
+const { generateMessage } = require('./utils/message');
+const { generateLocationMessage } = require('./utils/geolocation');
+
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
+
 io.on('connection',(socket)=>{
     
-    socket.emit('newMessage',{
-        from : "Admin",
-        text: "Welcome to the chat App"
-    })
-    socket.broadcast.emit('newMessage',{
-        from : "Admin",
-        text: "New User joined"
+    socket.emit('newMessage',generateMessage("Admin","Welcome to the chat App"))
+    
+    socket.broadcast.emit('newMessage', generateMessage("Admin","New User joined"))
 
-   
-    })
+    
     socket.on('disconnect',()=>{
         console.log("User disconnected")
     })
 
-    socket.on('createMessage', function(message){
-        console.log(message)
+    socket.on('createMessage', function(message,callback){
+        io.emit('newMessage',generateMessage(message.from,message.text))
+    })
+
+    socket.on('showGeolocation', function(geolocation){
+        io.emit('showGeolocation',generateLocationMessage("Admin",geolocation))
     })
    
     
