@@ -1,11 +1,22 @@
 const socket = io();
 
 socket.on('connect',function (){
+
+    const username = localStorage.getItem("username")
+    socket.emit('joinUsername',username)
     console.log('Connected to server')
     })
+
 socket.on('disconnect',function(){
         console.log('Disconnected from server')
     })
+
+socket.on('updatePeople',function(username){
+    const li = jQuery('<li></li>')
+    li.text(username)
+    jQuery('#users').append(li)
+
+})
 
 socket.on('newMessage',function(message){
     const li = jQuery('<li></li>')
@@ -27,9 +38,10 @@ socket.on('showGeolocation',function(message){
 
 jQuery('#message-form').on('submit',(e)=>{
     e.preventDefault();
+    const username = localStorage.getItem("username")
     const messageTextBox = jQuery('[name=message]')
     socket.emit('createMessage',{
-        from: "User",
+        from: username,
         text: messageTextBox.val()
     
     },function(){

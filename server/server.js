@@ -7,17 +7,42 @@ const { generateMessage } = require('./utils/message');
 const { generateLocationMessage } = require('./utils/geolocation');
 
 
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
+const port = process.env.PORT || 3000
+const publicPath = path.join(__dirname+'/../public');
+
+
+
+// app.set('views', path.join(__dirname, '/../public'));
+// app.set('view engine', 'hbs');
+
+app.use(express.static(publicPath))
+
+
+app.get('/',(req,res)=>{
+    res.render(publicPath+'/index')
+    
+    
+})
+
 
 io.on('connection',(socket)=>{
     
-    socket.emit('newMessage',generateMessage("Admin","Welcome to the chat App"))
-    
-    socket.broadcast.emit('newMessage', generateMessage("Admin","New User joined"))
+    socket.on('joinUsername',function(username){
+        socket.emit('newMessage',generateMessage("Admin",`Welcome ${username}!`))
+        socket.broadcast.emit('newMessage', generateMessage("Admin", `${username} joined.`))
+        socket.broadcast.emit('updatePeople',username)  
 
+    })
+    // socket.emit('newMessage',generateMessage("Admin","Welcome! "))
+    
+    // socket.broadcast.emit('newMessage', generateMessage("Admin","New User joined"))
+
+    
     
     socket.on('disconnect',()=>{
         console.log("User disconnected")
@@ -35,19 +60,6 @@ io.on('connection',(socket)=>{
     
 })
 
-app.use(express.static('./public'))
-// app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
 
-
-const port = process.env.PORT || 3000
-const publicPath = path.join(__dirname+'/../public');
-
-
-app.get('/',(req,res)=>{
-    res.render(publicPath+'/index')
-    
-    
-})
 
 server.listen(port)
